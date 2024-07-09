@@ -26,3 +26,12 @@ Content-Type: application/json
 ###
 
 DELETE http://localhost:3000/posts/5
+
+###
+
+PATCH http://localhost:3000/comments/1
+Content-Type: application/json
+
+{
+    "comment": "마라탕22"
+}

@@ -23,7 +23,7 @@ app.post('/posts', (req, res) => {
     const ids = posts.map((post) => post.id);
     newPost.id = Math.max(...ids) + 1;
     newPost.isliked = false;
-    newPost.comments = {};
+    newPost.comments = [];
     newPost.createdAt = new Date();
     newPost.updatedAt = new Date();
 
@@ -39,6 +39,17 @@ app.patch('/posts/:id', (req, res) => {
             post[key] = req.body[key];
         });
         post.updatedAt = new Date();
+        res.send(post);
+    } else {
+        res.status(404).send({ message: 'Cannot find given id.' });
+    }
+});
+
+app.patch('/comments/:id', (req, res) => {
+    const id = Number(req.params.id);
+    const post = posts.find((post) => post.id === id);
+    if (post) {
+        post['comments'].push(req.body['comment']);
         res.send(post);
     } else {
         res.status(404).send({ message: 'Cannot find given id.' });
