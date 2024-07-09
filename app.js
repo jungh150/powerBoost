@@ -45,4 +45,15 @@ app.patch('/posts/:id', (req, res) => {
     }
 });
 
+app.delete('/posts/:id', (req, res) => {
+    const id = Number(req.params.id);
+    const idx = posts.findIndex((post) => post.id === id);
+    if (idx >= 0) {
+        posts.splice(idx, 1);
+        res.sendStatus(204);
+    } else {
+        res.status(404).send({ message: 'Cannot find given id.' });
+    }
+});
+
 app.listen(3000, () => console.log('Server Started'));

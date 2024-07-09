@@ -22,3 +22,7 @@ Content-Type: application/json
 {
     "content": "거친세상에뛰어든건나니까암오케..사실안괜찮음"
 }
+
+###
+
+DELETE http://localhost:3000/posts/5
