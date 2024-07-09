@@ -4,10 +4,12 @@ import posts from './data/mock.js';
 const app = express();
 app.use(express.json());
 
+// 전체 글 조회
 app.get('/posts', (req, res) => {
     res.send(posts);
 });
 
+// 특정 글 조회
 app.get('/posts/:id', (req, res) => {
     const id = Number(req.params.id);
     const post = posts.find((post) => post.id === id);
@@ -18,6 +20,7 @@ app.get('/posts/:id', (req, res) => {
     }
 });
 
+// 글 작성
 app.post('/posts', (req, res) => {
     const newPost = req.body;
     const ids = posts.map((post) => post.id);
@@ -31,6 +34,7 @@ app.post('/posts', (req, res) => {
     res.status(201).send(newPost);
 });
 
+// 글 수정 (글에 좋아요 달기)
 app.patch('/posts/:id', (req, res) => {
     const id = Number(req.params.id);
     const post = posts.find((post) => post.id === id);
@@ -45,6 +49,7 @@ app.patch('/posts/:id', (req, res) => {
     }
 });
 
+// 글에 댓글 달기
 app.patch('/comments/:id', (req, res) => {
     const id = Number(req.params.id);
     const post = posts.find((post) => post.id === id);
@@ -56,6 +61,7 @@ app.patch('/comments/:id', (req, res) => {
     }
 });
 
+// 글 삭제
 app.delete('/posts/:id', (req, res) => {
     const id = Number(req.params.id);
     const idx = posts.findIndex((post) => post.id === id);
