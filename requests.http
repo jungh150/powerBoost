@@ -13,3 +13,12 @@ Content-Type: application/json
     "title": "힘들지만...",
     "content": "거친세상에뛰어든건나니까암오케"
 }
+
+###
+
+PATCH http://localhost:3000/posts/5
+Content-Type: application/json
+
+{
+    "content": "거친세상에뛰어든건나니까암오케..사실안괜찮음"
+}

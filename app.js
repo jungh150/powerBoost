@@ -31,4 +31,18 @@ app.post('/posts', (req, res) => {
     res.status(201).send(newPost);
 });
 
+app.patch('/posts/:id', (req, res) => {
+    const id = Number(req.params.id);
+    const post = posts.find((post) => post.id === id);
+    if (post) {
+        Object.keys(req.body).forEach((key) => {
+            post[key] = req.body[key];
+        });
+        post.updatedAt = new Date();
+        res.send(post);
+    } else {
+        res.status(404).send({ message: 'Cannot find given id.' });
+    }
+});
+
 app.listen(3000, () => console.log('Server Started'));
