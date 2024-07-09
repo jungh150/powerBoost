@@ -3,3 +3,13 @@ GET http://localhost:3000/posts
 ###
 
 GET http://localhost:3000/posts/1
+
+###
+
+POST http://localhost:3000/posts
+Content-Type: application/json
+
+{
+    "title": "힘들지만...",
+    "content": "거친세상에뛰어든건나니까암오케"
+}
