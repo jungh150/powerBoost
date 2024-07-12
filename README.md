@@ -32,13 +32,13 @@ DELETE http://localhost:3000/posts/5
 ```
 
 ##### 특정 글 조회
-GET request를 통해 특정 id의 글을 삭제할 수 있습니다.
+GET request를 통해 특정 id의 글을 조회할 수 있습니다.
 ```
 GET http://localhost:3000/posts/1
 ```
 
 ##### 전체 글 조회
-GET request를 통해 전체 글을 삭제할 수 있습니다.
+GET request를 통해 전체 글을 조회할 수 있습니다.
 ```
 GET http://localhost:3000/posts
 ```
