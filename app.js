@@ -1,5 +1,7 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
 import express from 'express';
-import posts from './data/mock.js';
+import { PrismaClient } from '@prisma/client';
 
 const app = express();
 app.use(express.json());
