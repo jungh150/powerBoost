@@ -142,6 +142,7 @@ response
     "updatedAt": "2024-07-17T22:00:46.218Z"
 }
 ```
+![스크린샷 2024-07-18 070101](https://github.com/user-attachments/assets/20f90f20-e054-41f9-8c6c-807ebff77806)
 #### 로그인
 request
 ```
@@ -159,6 +160,7 @@ response
     "message": "Login Success"
 }
 ```
+![스크린샷 2024-07-18 070236](https://github.com/user-attachments/assets/9604018c-0b09-4ca7-98fd-7e68438b4a09)
 #### 로그아웃
 request
 ```
@@ -170,6 +172,7 @@ response
     "message": "Logout Success"
 }
 ```
+![스크린샷 2024-07-18 070426](https://github.com/user-attachments/assets/419854e6-0b0d-4fc7-bdbd-6d947c96abcd)
 #### 전체 글 조회
 request
 ```
@@ -201,6 +204,7 @@ response
   ...
 ]
 ```
+![스크린샷 2024-07-18 071638](https://github.com/user-attachments/assets/169da79d-9c44-436a-b914-141bdfa39ff4)
 #### 특정 글 조회
 request
 ```
@@ -219,6 +223,7 @@ response
     "comments": []
 }
 ```
+![스크린샷 2024-07-18 071806](https://github.com/user-attachments/assets/132272c4-7587-45e9-b22c-b430a4e8d49d)
 #### 글 작성
 request
 ```
@@ -244,6 +249,7 @@ response
     "updatedAt": "2024-07-17T22:11:09.338Z"
 }
 ```
+![스크린샷 2024-07-18 071232](https://github.com/user-attachments/assets/789c39ef-4afd-40f2-8096-4c519a200b43)
 #### 글 수정
 request
 ```
@@ -266,6 +272,7 @@ response
     "updatedAt": "2024-07-17T22:20:16.451Z"
 }
 ```
+![스크린샷 2024-07-18 072048](https://github.com/user-attachments/assets/b744cd44-e592-430a-971e-555c8b07ce76)
 #### 글에 좋아요 누르기
 request
 ```
@@ -283,6 +290,7 @@ response
     "updatedAt": "2024-07-17T22:21:32.828Z"
 }
 ```
+![스크린샷 2024-07-18 072146](https://github.com/user-attachments/assets/108c4593-58a9-4693-8a2c-78e60a9e1cdd)
 #### 글에 좋아요 취소하기
 request
 ```
@@ -300,12 +308,14 @@ response
     "updatedAt": "2024-07-17T22:22:35.624Z"
 }
 ```
+![스크린샷 2024-07-18 072246](https://github.com/user-attachments/assets/795be598-b815-4ecc-88fd-d98ca6ec1003)
 #### 글 삭제
 request
 ```
 DELETE http://localhost:3000/posts/26a3c4bf-e327-4078-ac5e-3895edd5b38c
 ```
 no response
+![스크린샷 2024-07-18 072408](https://github.com/user-attachments/assets/d79e54a6-f133-42fa-9fba-44cb82290f04)
 #### 특정 글의 댓글 조회
 request
 ```
@@ -340,6 +350,7 @@ response
     }
 ]
 ```
+![스크린샷 2024-07-18 073018](https://github.com/user-attachments/assets/f75c0a47-3565-46fe-a74d-d50b0294cd68)
 #### 댓글 작성
 request
 ```
@@ -363,6 +374,7 @@ response
     "updatedAt": "2024-07-17T22:27:52.796Z"
 }
 ```
+![스크린샷 2024-07-18 072823](https://github.com/user-attachments/assets/984f4b2a-18e4-4502-b19f-45469c97204f)
 #### 댓글 수정
 request
 ```
@@ -384,12 +396,14 @@ response
     "updatedAt": "2024-07-17T22:31:09.020Z"
 }
 ```
+![스크린샷 2024-07-18 073154](https://github.com/user-attachments/assets/cb6387c6-a898-4737-aa52-1ab52e2d22e1)
 #### 댓글 삭제
 request
 ```
 DELETE http://localhost:3000/comments/53b0dee8-51b2-4b35-976e-54fbf921eb92
 ```
 no response
+![스크린샷 2024-07-18 075315](https://github.com/user-attachments/assets/2fea4c57-ec95-4029-a7f5-0c812f802597)
 
 ### 내용 정리
 #### migration
