@@ -280,7 +280,7 @@ app.patch('/comments/:id', asyncHandler(async (req, res) => {
   res.send(comment);
 }));
 
-// 글 삭제
+// 댓글 삭제
 app.delete('/comments/:id', asyncHandler(async (req, res) => {
   const { id } = req.params;
   await prisma.comment.delete({
