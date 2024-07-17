@@ -1,12 +1,23 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
+import bcrypt from "bcryptjs";
 import { PrismaClient, Prisma } from '@prisma/client';
+import cookieParser from 'cookie-parser';
+import session from 'express-session';
 
 const prisma = new PrismaClient();
 
 const app = express();
 app.use(express.json());
+
+const { SECRETE_KEY_CS } = process.env;
+app.use(cookieParser(SECRETE_KEY_CS));
+app.use(session({
+  secret: SECRETE_KEY_CS,
+  resave: false,
+  saveUninitialized: true
+}));
 
 function asyncHandler(handler) {
   return async function (req, res) {
