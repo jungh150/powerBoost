@@ -63,15 +63,36 @@ app.post("/register", asyncHandler(async (req, res) => {
 
 // 로그인
 app.post("/login", asyncHandler(async (req, res) => {
-  const { userName, password } = req.body;
+  const { id, password } = req.body;
   const user = await prisma.user.findUnique({
     where: { id },
   });
-  res.status(201).send(user);
+  if (!user) {
+    console.log("user not found");
+    return res.status(400).json({ message: "User not found" });
+  }
+  const isMatch = bcrypt.compareSync(password, user.password);
+  if (isMatch) {
+    if (!req.session.user) {
+      req.session.user = {
+        id: id,
+        password: password,
+        authorized: true,
+      };
+    }
+    res.json({ message: "Login Success" });
+  } else {
+    res.status(400).json({ message: "Password incorrect" });
+  }
 }));
 
 // 로그아웃
-
+app.post("/logout", asyncHandler(async (req, res) => {
+  if (req.session.user) {
+    req.session.destroy();
+    res.json({ message: "Logout Success" });
+  }
+}));
 
 /*********** users ***********/
 
