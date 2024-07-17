@@ -44,7 +44,11 @@ app.get('/users/:id', asyncHandler(async (req, res) => {
   const user = await prisma.user.findUnique({
     where: { id },
   });
-  res.send(user);
+  if (user) {
+    res.send(user);
+  } else {
+    res.status(404).send({ message: 'Cannot find given id.' });
+  }
 }));
 
 // 유저 생성
@@ -62,7 +66,11 @@ app.patch('/users/:id', asyncHandler(async (req, res) => {
     where: { id },
     data: req.body,
   });
-  res.send(user);
+  if (user) {
+    res.send(user);
+  } else {
+    res.status(404).send({ message: 'Cannot find given id.' });
+  }
 }));
 
 // 유저 삭제
