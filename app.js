@@ -136,15 +136,45 @@ app.delete('/posts/:id', asyncHandler(async (req, res) => {
 /*********** commets ***********/
 
 // 글에 댓글 달기
-app.patch('/comments/:id', (req, res) => {
-  const id = Number(req.params.id);
-  const post = posts.find((post) => post.id === id);
+// app.patch('/comments/:id', (req, res) => {
+//   const id = Number(req.params.id);
+//   const post = posts.find((post) => post.id === id);
+//   if (post) {
+//     post['comments'].push(req.body['comment']);
+//     res.send(post);
+//   } else {
+//     res.status(404).send({ message: 'Cannot find given id.' });
+//   }
+// });
+
+// 전체 댓글 조회
+app.get('/comments', asyncHandler(async (req, res) => {
+  const comments = await prisma.comment.findMany();
+  res.send(comments);
+}));
+
+// 특정 글의 댓글 조회
+app.get('/comments/:postId', asyncHandler(async (req, res) => {
+  const { postId } = req.params;
+  const post = await prisma.post.findUnique({
+    where: { id: postId },
+    include: {
+      comments: true,
+    },
+  });
   if (post) {
-    post['comments'].push(req.body['comment']);
-    res.send(post);
+    res.send(post.comments);
   } else {
     res.status(404).send({ message: 'Cannot find given id.' });
   }
-});
+}));
+
+// 댓글 작성
+app.post('/comments', asyncHandler(async (req, res) => {
+  const comment = await prisma.comment.create({
+    data: req.body,
+  });
+  res.status(201).send(comment);
+}));
 
 app.listen(3000, () => console.log('Server Started'));
