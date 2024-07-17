@@ -44,18 +44,31 @@ function asyncHandler(handler) {
 
 // 회원가입
 app.post("/register", asyncHandler(async (req, res) => {
-  const { userName, password } = req.body;
+  const { id, password } = req.body;
+  const user = await prisma.user.findUnique({
+    where: { id },
+  });
+  if (user) {
+    return res.status(400).json({ message: "User already exists" });
+  }
   const hashedPassword = bcrypt.hashSync(password, 10);
-  const user = await prisma.user.create({
+  const newUser = await prisma.user.create({
     data: {
-      userName: userName,
+      id: id,
       password: hashedPassword,
     },
   });
-  res.status(201).send(user);
+  res.status(201).send(newUser);
 }));
 
 // 로그인
+app.post("/login", asyncHandler(async (req, res) => {
+  const { userName, password } = req.body;
+  const user = await prisma.user.findUnique({
+    where: { id },
+  });
+  res.status(201).send(user);
+}));
 
 // 로그아웃
 

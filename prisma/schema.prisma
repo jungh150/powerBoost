@@ -14,9 +14,8 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
+  id        String    @id
   password  String
-  userName  String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   Post      Post[]
