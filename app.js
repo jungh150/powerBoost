@@ -82,7 +82,11 @@ app.delete('/users/:id', asyncHandler(async (req, res) => {
 
 // 전체 글 조회
 app.get('/posts', asyncHandler(async (req, res) => {
-  const posts = await prisma.post.findMany();
+  const posts = await prisma.post.findMany({
+    include: {
+      comments: true,
+    },
+  });
   res.send(posts);
 }));
 
@@ -91,6 +95,9 @@ app.get('/posts/:id', asyncHandler(async (req, res) => {
   const { id } = req.params;
   const post = await prisma.post.findUnique({
     where: { id },
+    include: {
+      comments: true,
+    },
   });
   if (post) {
     res.send(post);
