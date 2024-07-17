@@ -177,4 +177,23 @@ app.post('/comments', asyncHandler(async (req, res) => {
   res.status(201).send(comment);
 }));
 
+// 댓글 수정
+app.patch('/comments/:id', asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const comment = await prisma.comment.update({
+    where: { id },
+    data: req.body,
+  });
+  res.send(comment);
+}));
+
+// 글 삭제
+app.delete('/comments/:id', asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  await prisma.comment.delete({
+    where: { id },
+  });
+  res.sendStatus(204);
+}));
+
 app.listen(3000, () => console.log('Server Started'));
