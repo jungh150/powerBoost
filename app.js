@@ -11,10 +11,9 @@ const prisma = new PrismaClient();
 const app = express();
 app.use(express.json());
 
-const { SECRETE_KEY_CS } = process.env;
-app.use(cookieParser(SECRETE_KEY_CS));
+app.use(cookieParser());
 app.use(session({
-  secret: SECRETE_KEY_CS,
+  secret: 'secret-key',
   resave: false,
   saveUninitialized: true
 }));
@@ -40,6 +39,26 @@ function asyncHandler(handler) {
     }
   };
 }
+
+/*********** auth ***********/
+
+// 회원가입
+app.post("/register", asyncHandler(async (req, res) => {
+  const { userName, password } = req.body;
+  const hashedPassword = bcrypt.hashSync(password, 10);
+  const user = await prisma.user.create({
+    data: {
+      userName: userName,
+      password: hashedPassword,
+    },
+  });
+  res.status(201).send(user);
+}));
+
+// 로그인
+
+// 로그아웃
+
 
 /*********** users ***********/
 
