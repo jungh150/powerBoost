@@ -66,11 +66,7 @@ app.patch('/users/:id', asyncHandler(async (req, res) => {
     where: { id },
     data: req.body,
   });
-  if (user) {
-    res.send(user);
-  } else {
-    res.status(404).send({ message: 'Cannot find given id.' });
-  }
+  res.send(user);
 }));
 
 // 유저 삭제
@@ -105,30 +101,26 @@ app.get('/posts/:id', asyncHandler(async (req, res) => {
 
 // 글 작성
 app.post('/posts', asyncHandler(async (req, res) => {
-  const user = await prisma.user.create({
+  const post = await prisma.post.create({
     data: req.body,
   });
-  res.status(201).send(user);
+  res.status(201).send(post);
 }));
 
 // 글 수정
 app.patch('/posts/:id', asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const user = await prisma.user.update({
+  const post = await prisma.post.update({
     where: { id },
     data: req.body,
   });
-  if (user) {
-    res.send(user);
-  } else {
-    res.status(404).send({ message: 'Cannot find given id.' });
-  }
+  res.send(post);
 }));
 
 // 글 삭제
 app.delete('/posts/:id', asyncHandler(async (req, res) => {
   const { id } = req.params;
-  await prisma.user.delete({
+  await prisma.post.delete({
     where: { id },
   });
   res.sendStatus(204);
