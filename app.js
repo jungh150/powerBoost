@@ -188,6 +188,35 @@ app.patch('/posts/:id', asyncHandler(async (req, res) => {
   res.send(post);
 }));
 
+// 글에 좋아요 누르기
+app.patch('/posts/like/:id', asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const post = await prisma.post.findUnique({
+    where: { id },
+  });
+  const likeNum = post.like + 1;
+  const newPost = await prisma.post.update({
+    where: { id },
+    data: { like: likeNum },
+  });
+  res.send(newPost);
+}));
+
+// 글에 좋아요 취소하기
+app.patch('/posts/unlike/:id', asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const post = await prisma.post.findUnique({
+    where: { id },
+  });
+  let likeNum = post.like - 1;
+  if (likeNum < 0) likeNum = 0;
+  const newPost = await prisma.post.update({
+    where: { id },
+    data: { like: likeNum },
+  });
+  res.send(newPost);
+}));
+
 // 글 삭제
 app.delete('/posts/:id', asyncHandler(async (req, res) => {
   const { id } = req.params;
