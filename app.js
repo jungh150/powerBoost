@@ -1,56 +1,78 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 const app = express();
 app.use(express.json());
 
+function asyncHandler(handler) {
+  return async function (req, res) {
+    try {
+      await handler(req, res);
+    } catch (e) {
+      if (
+        e.name === 'StructError' ||
+        e instanceof Prisma.PrismaClientValidationError
+      ) {
+        res.status(400).send({ message: e.message });
+      } else if (
+        e instanceof Prisma.PrismaClientKnownRequestError &&
+        e.code === 'P2025'
+      ) {
+        res.sendStatus(404);
+      } else {
+        res.status(500).send({ message: e.message });
+      }
+    }
+  };
+}
+
 /*********** users ***********/
 
 // 전체 유저 조회
-app.get('/users', async (req, res) => {
+app.get('/users', asyncHandler(async (req, res) => {
   const users = await prisma.user.findMany();
   res.send(users);
-});
+}));
 
 // 특정 유저 조회
-app.get('/users/:id', async (req, res) => {
+app.get('/users/:id', asyncHandler(async (req, res) => {
   const { id } = req.params;
   const user = await prisma.user.findUnique({
     where: { id },
   });
   res.send(user);
-});
+}));
 
 // 유저 생성
-app.post('/users', async (req, res) => {
+app.post('/users', asyncHandler(async (req, res) => {
   const user = await prisma.user.create({
     data: req.body,
   });
   res.status(201).send(user);
-});
+}));
 
 // 유저 수정
-app.patch('/users/:id', async (req, res) => {
+app.patch('/users/:id', asyncHandler(async (req, res) => {
   const { id } = req.params;
   const user = await prisma.user.update({
     where: { id },
     data: req.body,
   });
   res.send(user);
-});
+}));
 
 // 유저 삭제
-app.delete('/users/:id', async (req, res) => {
+app.delete('/users/:id', asyncHandler(async (req, res) => {
   const { id } = req.params;
   await prisma.user.delete({
     where: { id },
   });
   res.sendStatus(204);
-});
+}));
 
 /*********** posts ***********/
 
