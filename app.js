@@ -3,20 +3,13 @@ dotenv.config();
 import express from 'express';
 import bcrypt from "bcryptjs";
 import { PrismaClient, Prisma } from '@prisma/client';
-import cookieParser from 'cookie-parser';
-import session from 'express-session';
+import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
+const secretKey = process.env.JWT_SECRET_KEY;
 
 const app = express();
 app.use(express.json());
-
-app.use(cookieParser());
-app.use(session({
-  secret: 'secret-key',
-  resave: false,
-  saveUninitialized: true
-}));
 
 function asyncHandler(handler) {
   return async function (req, res) {
