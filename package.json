@@ -17,6 +17,7 @@
     "express": "^4.19.2",
     "is-email": "^1.0.2",
     "is-uuid": "^1.0.2",
+    "jsonwebtoken": "^9.0.2",
     "prisma": "^5.16.2",
     "superstruct": "^1.0.3"
   },
