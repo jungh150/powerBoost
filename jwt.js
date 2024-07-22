@@ -1,12 +1,14 @@
 import jwt from 'jsonwebtoken';
 const secretKey = process.env.JWT_SECRET_KEY;
 
-const generateToken = (payload) => {
+// 새로운 토큰을 생성하는 함수
+export const generateToken = (payload) => {
   const token = jwt.sign(payload, secretKey, { expiresIn: '10m' });
     return token;
 };
 
-const refreshToken = (token) => {
+// 기존 토큰을 사용하여 새로운 토큰을 생성하는 함수
+export const refreshToken = (token) => {
   try {
     const decoded = jwt.verify(token, secretKey);
     const payload = {
@@ -21,8 +23,10 @@ const refreshToken = (token) => {
   }
 };
 
-function loginRequired(req, res, next) {
+// 로그인이 필요한 api 요청 시
+export function loginRequired(req, res, next) {
     const userToken = req.headers["authorization"]?.split(" ")[1];
+    // 토큰이 없을 경우
     if (!userToken || userToken === "null") {
         console.log("Authorization 토큰: 없음");
         res.status(401).json({
@@ -31,11 +35,16 @@ function loginRequired(req, res, next) {
         });
         return;
     }
-
+    // 해당 토큰이 정상적인 토큰인지 확인
     try {
         const jwtDecoded = jwt.verify(userToken, secretKey);
         const userId = jwtDecoded.userId;
         req.currentUserId = userId;
+        // 토큰 갱신
+        const newToken = refreshToken(userToken);
+        if (newToken) {
+          res.cookie('token', newToken, { httpOnly: true, maxAge: 3600000 });
+        }
         next();
     } catch (error) {
         res.status(401).json({
@@ -45,16 +54,3 @@ function loginRequired(req, res, next) {
         return;
     }
 }
-
-const refreshJwtMiddleware = (req, res, next) => {
-    const token = req.cookies.token;
-    if (token) {
-      const newToken = refreshToken(token);
-      if (newToken) {
-        res.cookie('token', newToken, { httpOnly: true, maxAge: 3600000 });
-      }
-    }
-    next();
-};
-
-module.exports = { generateToken, refreshToken, loginRequired, refreshJwtMiddleware };

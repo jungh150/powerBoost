@@ -2,14 +2,18 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
 import bcrypt from "bcryptjs";
+import cookieParser from "cookie-parser";
 import { PrismaClient, Prisma } from '@prisma/client';
 import jwt from 'jsonwebtoken';
+import { generateToken, loginRequired } from './jwt.js';
+//import jwtt from './jwt.js';
 
 const prisma = new PrismaClient();
 const secretKey = process.env.JWT_SECRET_KEY;
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 
 function asyncHandler(handler) {
   return async function (req, res) {
@@ -42,7 +46,7 @@ app.post("/register", asyncHandler(async (req, res) => {
     where: { id },
   });
   if (user) {
-    return res.status(400).json({ message: "User already exists" });
+    return res.status(400).json({ message: "이미 존재하는 아이디입니다." });
   }
   const hashedPassword = bcrypt.hashSync(password, 10);
   const newUser = await prisma.user.create({
@@ -60,31 +64,40 @@ app.post("/login", asyncHandler(async (req, res) => {
   const user = await prisma.user.findUnique({
     where: { id },
   });
+  // 해당 유저가 없는 경우
   if (!user) {
-    console.log("user not found");
-    return res.status(400).json({ message: "User not found" });
+    console.log("가입되지 않은 아이디입니다.");
+    return res.status(400).json({ message: "가입되지 않은 아이디입니다." });
   }
+  // 비밀번호가 일치하는지 확인
   const isMatch = bcrypt.compareSync(password, user.password);
   if (isMatch) {
-    if (!req.session.user) {
-      req.session.user = {
-        id: id,
-        password: password,
-        authorized: true,
-      };
-    }
-    res.json({ message: "Login Success" });
+    const payload = { userId: id };
+    const token = generateToken(payload);
+    res.cookie('token', token, { httpOnly: true, maxAge: 3600000 });
+    res.json({ message: "로그인 되었습니다." });
   } else {
-    res.status(400).json({ message: "Password incorrect" });
+    res.status(400).json({ message: "비밀번호가 일치하지 않습니다." });
   }
 }));
 
 // 로그아웃
 app.post("/logout", asyncHandler(async (req, res) => {
-  if (req.session.user) {
-    req.session.destroy();
-    res.json({ message: "Logout Success" });
+  const token = req.cookies.token;
+  // 토큰이 없을 경우
+  if (!token) {
+    res.status(400).json({ message: '토큰이 없습니다. 로그인 상태를 확안하세요.' });
+    return;
   }
+  // 토큰이 정상적인 토큰이 아닌 경우
+  const decoded = jwt.decode(token);
+  if (!decoded) {
+      res.status(401).json({ message: '잘못된 토큰입니다. 로그인 상태를 확인하세요.' });
+      return;
+  }
+  // 쿠키 삭제
+  res.clearCookie('token');
+  res.json({ message: '로그아웃 되었습니다.' });
 }));
 
 /*********** users ***********/
