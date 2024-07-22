@@ -31,7 +31,6 @@ export function loginRequired(req, res, next) {
   const cookieToken = req.cookies.token;
   
   const token = headerToken || cookieToken;
-  console.log(token);
   // 토큰이 없을 경우
   if (!token || token === "null") {
       console.log("Authorization 토큰: 없음");

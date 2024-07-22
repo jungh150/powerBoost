@@ -74,7 +74,6 @@ app.post("/login", asyncHandler(async (req, res) => {
   if (isMatch) {
     const payload = { userId: id };
     const token = generateToken(payload);
-    console.log(token);
     res.cookie('token', token, { httpOnly: true, maxAge: 3600000 });
     res.json({ message: "로그인 되었습니다." });
   } else {
@@ -180,7 +179,10 @@ app.get('/posts/:id', asyncHandler(async (req, res) => {
 // 글 작성
 app.post('/posts', loginRequired, asyncHandler(async (req, res) => {
   const post = await prisma.post.create({
-    data: req.body,
+    data: {
+      ...req.body,
+      userId: req.currentUserId,
+    }
   });
   res.status(201).send(post);
 }));
@@ -260,7 +262,10 @@ app.get('/comments/:postId', asyncHandler(async (req, res) => {
 // 댓글 작성
 app.post('/comments', loginRequired, asyncHandler(async (req, res) => {
   const comment = await prisma.comment.create({
-    data: req.body,
+    data: {
+      ...req.body,
+      userId: req.currentUserId,
+    }
   });
   res.status(201).send(comment);
 }));
