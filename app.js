@@ -74,6 +74,7 @@ app.post("/login", asyncHandler(async (req, res) => {
   if (isMatch) {
     const payload = { userId: id };
     const token = generateToken(payload);
+    console.log(token);
     res.cookie('token', token, { httpOnly: true, maxAge: 3600000 });
     res.json({ message: "로그인 되었습니다." });
   } else {
@@ -177,7 +178,7 @@ app.get('/posts/:id', asyncHandler(async (req, res) => {
 }));
 
 // 글 작성
-app.post('/posts', asyncHandler(async (req, res) => {
+app.post('/posts', loginRequired, asyncHandler(async (req, res) => {
   const post = await prisma.post.create({
     data: req.body,
   });
@@ -185,7 +186,7 @@ app.post('/posts', asyncHandler(async (req, res) => {
 }));
 
 // 글 수정
-app.patch('/posts/:id', asyncHandler(async (req, res) => {
+app.patch('/posts/:id', loginRequired, asyncHandler(async (req, res) => {
   const { id } = req.params;
   const post = await prisma.post.update({
     where: { id },
@@ -195,7 +196,7 @@ app.patch('/posts/:id', asyncHandler(async (req, res) => {
 }));
 
 // 글에 좋아요 누르기
-app.patch('/posts/like/:id', asyncHandler(async (req, res) => {
+app.patch('/posts/like/:id', loginRequired, asyncHandler(async (req, res) => {
   const { id } = req.params;
   const post = await prisma.post.findUnique({
     where: { id },
@@ -209,7 +210,7 @@ app.patch('/posts/like/:id', asyncHandler(async (req, res) => {
 }));
 
 // 글에 좋아요 취소하기
-app.patch('/posts/unlike/:id', asyncHandler(async (req, res) => {
+app.patch('/posts/unlike/:id', loginRequired, asyncHandler(async (req, res) => {
   const { id } = req.params;
   const post = await prisma.post.findUnique({
     where: { id },
@@ -224,7 +225,7 @@ app.patch('/posts/unlike/:id', asyncHandler(async (req, res) => {
 }));
 
 // 글 삭제
-app.delete('/posts/:id', asyncHandler(async (req, res) => {
+app.delete('/posts/:id', loginRequired, asyncHandler(async (req, res) => {
   const { id } = req.params;
   await prisma.post.delete({
     where: { id },
@@ -257,7 +258,7 @@ app.get('/comments/:postId', asyncHandler(async (req, res) => {
 }));
 
 // 댓글 작성
-app.post('/comments', asyncHandler(async (req, res) => {
+app.post('/comments', loginRequired, asyncHandler(async (req, res) => {
   const comment = await prisma.comment.create({
     data: req.body,
   });
@@ -265,7 +266,7 @@ app.post('/comments', asyncHandler(async (req, res) => {
 }));
 
 // 댓글 수정
-app.patch('/comments/:id', asyncHandler(async (req, res) => {
+app.patch('/comments/:id', loginRequired, asyncHandler(async (req, res) => {
   const { id } = req.params;
   const comment = await prisma.comment.update({
     where: { id },
@@ -275,7 +276,7 @@ app.patch('/comments/:id', asyncHandler(async (req, res) => {
 }));
 
 // 댓글 삭제
-app.delete('/comments/:id', asyncHandler(async (req, res) => {
+app.delete('/comments/:id', loginRequired, asyncHandler(async (req, res) => {
   const { id } = req.params;
   await prisma.comment.delete({
     where: { id },
