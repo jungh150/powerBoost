@@ -340,4 +340,16 @@ app.post('/scrap', loginRequired, asyncHandler(async (req, res) => {
   res.status(201).send(scrap);
 }));
 
+// 스크랩 취소
+app.delete('/scrap/:postId', loginRequired, asyncHandler(async (req, res) => {
+  const { postId } = req.params;
+  const scrap = await prisma.scrap.findFirst({
+    where: { postId: postId, userId: req.currentUserId },
+  });
+  await prisma.scrap.delete({
+    where: { id: scrap.id },
+  });
+  res.sendStatus(204);
+}));
+
 app.listen(3000, () => console.log('Server Started'));
