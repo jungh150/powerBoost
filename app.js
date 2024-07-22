@@ -289,4 +289,44 @@ app.delete('/comments/:id', loginRequired, asyncHandler(async (req, res) => {
   res.sendStatus(204);
 }));
 
+/*********** scrap ***********/
+
+// 전체 스크랩 조회
+app.get('/scrap', asyncHandler(async (req, res) => {
+  const scraps = await prisma.scrap.findMany();
+  res.send(scraps);
+}));
+
+// 특정 유저의 스크랩 조회
+app.get('/scrap/user-scrap/:userId', asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+  const user = await prisma.post.findUnique({
+    where: { id: userId },
+    include: {
+      scarap: true,
+    },
+  });
+  if (user) {
+    res.send(user.scrap);
+  } else {
+    res.status(404).send({ message: 'Cannot find given user id.' });
+  }
+}));
+
+// 특정 글의 스크랩 조회
+app.get('/scrap/post-scrap/:postId', asyncHandler(async (req, res) => {
+  const { postId } = req.params;
+  const post = await prisma.post.findUnique({
+    where: { id: postId },
+    include: {
+      scrap: true,
+    },
+  });
+  if (post) {
+    res.send(post.scrap);
+  } else {
+    res.status(404).send({ message: 'Cannot find given post id.' });
+  }
+}));
+
 app.listen(3000, () => console.log('Server Started'));
