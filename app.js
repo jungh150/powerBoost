@@ -329,4 +329,15 @@ app.get('/scrap/post-scrap/:postId', asyncHandler(async (req, res) => {
   }
 }));
 
+// 스크랩
+app.post('/scrap', loginRequired, asyncHandler(async (req, res) => {
+  const scrap = await prisma.comment.create({
+    data: {
+      ...req.body,
+      userId: req.currentUserId,
+    }
+  });
+  res.status(201).send(scrap);
+}));
+
 app.listen(3000, () => console.log('Server Started'));
