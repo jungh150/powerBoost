@@ -294,7 +294,7 @@ response
 #### 글에 좋아요 취소하기
 request
 ```
-http://localhost:3000/posts/unlike/9c97afe3-acbd-4c6b-a921-f9a7055219b4
+PATCH http://localhost:3000/posts/unlike/9c97afe3-acbd-4c6b-a921-f9a7055219b4
 ```
 response
 ```
@@ -514,3 +514,249 @@ app.post("/logout", asyncHandler(async (req, res) => {
 ### 회고
 다른 부분들은 괜찮았는데, 회원가입/로그인 기능 구현이 어려웠다. node.js로는 처음 해보는 부분이어서 검색을 해가며 시도했고, 특히 패키지 설치하는 게 제대로 안 되어서 애를 먹었다. 첫번째 설치 시에는 게속 오류가 나서 한번 다 제거했다가 다시 설치하니 정상적으로 실행되었다.
 추가로, Commet 테이블을 따로 만들어서 Post 출력할 때 Comment도 같이 출력되도록 구현했다.
+
+## 3주차: jwt 인증 방식으로 변경 + 스크랩 기능/게시물 검색 기능 추가
+
+### 주요 기능
+#### 특정 유저의 스크랩 조회
+request
+```
+GET http://localhost:3000/scrap/user-scrap/jungh
+```
+response
+```
+[
+    {
+        "id": "36ec7852-f6c7-498a-8afe-15af330afe01",
+        "createdAt": "2024-07-23T17:26:08.805Z",
+        "updatedAt": "2024-07-23T17:26:08.805Z",
+        "userId": "jungh",
+        "postId": "a88ed312-dd18-4a06-b069-65e381862b59"
+    },
+    {
+        "id": "c64b8f5f-96b7-47db-b480-1353efd86152",
+        "createdAt": "2024-07-23T17:24:39.209Z",
+        "updatedAt": "2024-07-23T17:24:39.209Z",
+        "userId": "jungh",
+        "postId": "231e92b7-1186-4112-b013-6da658368916"
+    }
+]
+```
+#### 특정 글의 스크랩 조회
+request
+```
+GET http://localhost:3000/scrap/post-scrap/231e92b7-1186-4112-b013-6da658368916
+```
+response
+```
+[
+    {
+        "id": "9ac04a86-6b5f-41a1-84d1-df0fe9dc9bc5",
+        "createdAt": "2024-07-23T18:01:52.897Z",
+        "updatedAt": "2024-07-23T18:01:52.897Z",
+        "userId": "newclean",
+        "postId": "231e92b7-1186-4112-b013-6da658368916"
+    },
+    {
+        "id": "c64b8f5f-96b7-47db-b480-1353efd86152",
+        "createdAt": "2024-07-23T17:24:39.209Z",
+        "updatedAt": "2024-07-23T17:24:39.209Z",
+        "userId": "jungh",
+        "postId": "231e92b7-1186-4112-b013-6da658368916"
+    }
+]
+```
+#### 스크랩
+request
+```
+POST http://localhost:3000/scrap
+Content-Type: application/json
+
+{
+    "postId": "231e92b7-1186-4112-b013-6da658368916"
+}
+```
+response
+```
+{
+    "id": "9ac04a86-6b5f-41a1-84d1-df0fe9dc9bc5",
+    "createdAt": "2024-07-23T18:01:52.897Z",
+    "updatedAt": "2024-07-23T18:01:52.897Z",
+    "userId": "newclean",
+    "postId": "231e92b7-1186-4112-b013-6da658368916"
+}
+```
+#### 스크랩 취소
+request
+```
+DELETE http://localhost:3000/scrap/231e92b7-1186-4112-b013-6da658368916
+```
+no response
+#### 게시물 검색
+request
+```
+GET http://localhost:3000/posts?search=저녁
+```
+response
+```
+[
+    {
+        "id": "d4d5cb73-0d5c-4b9e-af08-60b9128f2f80",
+        "title": "저녁 메뉴 추천 좀",
+        "content": "뭐 먹을까? 댓글로 남겨줘.",
+        "userId": "jungh",
+        "like": 0,
+        "createdAt": "2024-07-22T11:44:27.119Z",
+        "updatedAt": "2024-07-22T11:44:27.119Z",
+        "comments": []
+    }
+]
+```
+
+### 내용 정리
+#### database erd
+https://www.erdcloud.com/d/8v2Kc5jKSjMdFZfuo
+#### 로그인 기능: jwt 인증 방식으로 변경
+로그인 기능: 해당 유저가 있는지, 비밀번호가 일치하는지 확인 후 jwt 토큰을 발급한다. 
+```
+app.post("/login", asyncHandler(async (req, res) => {
+  const { id, password } = req.body;
+  const user = await prisma.user.findUnique({
+    where: { id },
+  });
+  // 해당 유저가 없는 경우
+  if (!user) {
+    console.log("가입되지 않은 아이디입니다.");
+    return res.status(400).json({ message: "가입되지 않은 아이디입니다." });
+  }
+  // 비밀번호가 일치하는지 확인
+  const isMatch = bcrypt.compareSync(password, user.password);
+  if (isMatch) {
+    const payload = { userId: id };
+    const token = generateToken(payload);
+    res.cookie('token', token, { httpOnly: true, maxAge: 3600000 });
+    res.json({ message: "로그인 되었습니다." });
+  } else {
+    res.status(400).json({ message: "비밀번호가 일치하지 않습니다." });
+  }
+}));
+```
+로그아웃 기능: 토큰이 있는지, 정상적인 토큰인지 확인한 후 토큰 관련 쿠키를 삭제한다.
+```
+app.post("/logout", asyncHandler(async (req, res) => {
+  const token = req.cookies.token;
+  // 토큰이 없을 경우
+  if (!token) {
+    res.status(400).json({ message: '토큰이 없습니다. 로그인 상태를 확안하세요.' });
+    return;
+  }
+  // 토큰이 정상적인 토큰이 아닌 경우
+  const decoded = jwt.decode(token);
+  if (!decoded) {
+      res.status(401).json({ message: '잘못된 토큰입니다. 로그인 상태를 확인하세요.' });
+      return;
+  }
+  // 쿠키 삭제
+  res.clearCookie('token');
+  res.json({ message: '로그아웃 되었습니다.' });
+}));
+```
+#### jwt.js (jwt 토큰 관련 파일)
+```
+import jwt from 'jsonwebtoken';
+const secretKey = process.env.JWT_SECRET_KEY;
+
+// 새로운 토큰을 생성하는 함수
+export const generateToken = (payload) => {
+  const token = jwt.sign(payload, secretKey, { expiresIn: '10m' });
+    return token;
+};
+
+// 기존 토큰을 사용하여 새로운 토큰을 생성하는 함수
+export const refreshToken = (token) => {
+  try {
+    const decoded = jwt.verify(token, secretKey);
+    const payload = {
+      userId: decoded.userId,
+      isAdmin: decoded.isAdmin,
+    };
+    const newToken = generateToken(payload);
+    return newToken;
+  } catch (error) {
+    console.error('Error refreshing token:', error);
+    return null;
+  }
+};
+
+// 로그인이 필요한 api 요청 시
+export function loginRequired(req, res, next) {
+  // 헤더에서 토큰 가져오기
+  const headerToken = req.headers['authorization']?.split(' ')[1];
+  // 쿠키에서 토큰 가져오기
+  const cookieToken = req.cookies.token;
+  
+  const token = headerToken || cookieToken;
+  // 토큰이 없을 경우
+  if (!token || token === "null") {
+      console.log("Authorization 토큰: 없음");
+      res.status(401).json({
+          result: "forbidden-approach",
+          message: "로그인한 유저만 사용할 수 있는 서비스입니다.",
+      });
+      return;
+  }
+  // 해당 토큰이 정상적인 토큰인지 확인
+  try {
+      const jwtDecoded = jwt.verify(token, secretKey);
+      const userId = jwtDecoded.userId;
+      req.currentUserId = userId;
+      // 토큰 갱신
+      const newToken = refreshToken(token);
+      if (newToken) {
+        res.cookie('token', newToken, { httpOnly: true, maxAge: 3600000 });
+      }
+      next();
+  } catch (error) {
+      res.status(401).json({
+          result: "forbidden-approach",
+          message: "정상적인 토큰이 아닙니다.",
+      });
+      return;
+  }
+}
+```
+#### 게시물 검색 기능
+? 뒤에 search={키워드}를 붙여서 쿼리를 보내면 키워드가 제목 또는 내용에 포함되는 글을 모두 조회할 수 있다. 
+```
+// 전체 글 조회
+app.get('/posts', asyncHandler(async (req, res) => {
+  const { search } = req.query;
+  const searchCondition = search ? {
+    OR: [
+      {
+        title: {
+          contains: search,
+          // mode: 'insensitive', // 대소문자 구분 없이 검색
+        },
+      },
+      {
+        content: {
+          contains: search,
+          // mode: 'insensitive', // 대소문자 구분 없이 검색
+        },
+      },
+    ],
+  } : {};
+
+  const posts = await prisma.post.findMany({
+    where: searchCondition,
+    include: {
+      comments: true,
+    },
+  });
+  res.send(posts);
+}));
+```
+
+### 회고
+jwt 토큰은 처음 다뤄봐서 이 부분이 제일 오래 걸렸다. 구글링을 많이 하면서 어떤식으로 하는지를 배우고 여러 오류들을 만나고 해결하면서 겨우 했다. 그리고 게시물 검색할 때 대소문자 구분 없이 검색할 수 있도록 `mode: 'insensitive'`을 넣었는데, 무슨 이유에서인지 자꾸 오류가 나서 일단 뺐다. 다른 방법으로 해야할 것 같다.
