@@ -542,6 +542,7 @@ response
     }
 ]
 ```
+![스크린샷 2024-07-24 025816](https://github.com/user-attachments/assets/e46da1b5-5ccd-4f81-aa74-7dcf6945e92b)
 #### 특정 글의 스크랩 조회
 request
 ```
@@ -566,6 +567,7 @@ response
     }
 ]
 ```
+![스크린샷 2024-07-24 025853](https://github.com/user-attachments/assets/8a069300-5214-4807-9908-4b31d89cfb85)
 #### 스크랩
 request
 ```
@@ -586,12 +588,14 @@ response
     "postId": "231e92b7-1186-4112-b013-6da658368916"
 }
 ```
+![스크린샷 2024-07-24 025737](https://github.com/user-attachments/assets/8da84075-2f1f-452a-a503-5ebeb581d9b1)
 #### 스크랩 취소
 request
 ```
 DELETE http://localhost:3000/scrap/231e92b7-1186-4112-b013-6da658368916
 ```
 no response
+![스크린샷 2024-07-24 030036](https://github.com/user-attachments/assets/c0ada7a9-f2df-491b-b612-94f5d89d19b8)
 #### 게시물 검색
 request
 ```
@@ -612,9 +616,11 @@ response
     }
 ]
 ```
+![스크린샷 2024-07-24 030750](https://github.com/user-attachments/assets/6a698810-0646-4b63-b9b3-cafa5ee0b568)
 
 ### 내용 정리
 #### database erd
+![스크린샷 2024-07-23 054630](https://github.com/user-attachments/assets/3910b589-90e4-44f1-8dbd-f37f473d8076)
 https://www.erdcloud.com/d/8v2Kc5jKSjMdFZfuo
 #### 로그인 기능: jwt 인증 방식으로 변경
 로그인 기능: 해당 유저가 있는지, 비밀번호가 일치하는지 확인 후 jwt 토큰을 발급한다. 
