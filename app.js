@@ -152,7 +152,26 @@ app.delete('/users/:id', asyncHandler(async (req, res) => {
 
 // 전체 글 조회
 app.get('/posts', asyncHandler(async (req, res) => {
+  const { search } = req.query;
+  const searchCondition = search ? {
+    OR: [
+      {
+        title: {
+          contains: search,
+          // mode: 'insensitive', // 대소문자 구분 없이 검색
+        },
+      },
+      {
+        content: {
+          contains: search,
+          // mode: 'insensitive', // 대소문자 구분 없이 검색
+        },
+      },
+    ],
+  } : {};
+
   const posts = await prisma.post.findMany({
+    where: searchCondition,
     include: {
       comments: true,
     },
@@ -300,10 +319,10 @@ app.get('/scrap', asyncHandler(async (req, res) => {
 // 특정 유저의 스크랩 조회
 app.get('/scrap/user-scrap/:userId', asyncHandler(async (req, res) => {
   const { userId } = req.params;
-  const user = await prisma.post.findUnique({
+  const user = await prisma.user.findUnique({
     where: { id: userId },
     include: {
-      scarap: true,
+      scrap: true,
     },
   });
   if (user) {
@@ -331,7 +350,7 @@ app.get('/scrap/post-scrap/:postId', asyncHandler(async (req, res) => {
 
 // 스크랩
 app.post('/scrap', loginRequired, asyncHandler(async (req, res) => {
-  const scrap = await prisma.comment.create({
+  const scrap = await prisma.scrap.create({
     data: {
       ...req.body,
       userId: req.currentUserId,
